@@ -9,7 +9,6 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { AppError, notFoundHandler } from "./utils/errors.js";
 import { connectDatabase, disconnectDatabase } from "./utils/db.js";
 
-if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI must be configured before starting the API.");
 if (!process.env.JWT_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET.length < 32) {
   throw new Error("JWT_ACCESS_SECRET must contain at least 32 characters.");
 }
@@ -46,7 +45,13 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const port = Number(process.env.PORT || 4000);
-await connectDatabase();
+try {
+  await connectDatabase();
+} catch (error) {
+  console.error(error.message);
+  process.exitCode = 1;
+  throw error;
+}
 const server = app.listen(port, () => {
   console.log(`Inventory API listening on port ${port}`);
 });

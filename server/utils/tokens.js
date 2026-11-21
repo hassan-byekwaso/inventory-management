@@ -39,3 +39,8 @@ export function refreshCookieOptions() {
     maxAge: Number(process.env.REFRESH_TOKEN_DAYS || 14) * 24 * 60 * 60 * 1000
   };
 }
+
+export function refreshCookieClearOptions() {
+  const { maxAge, ...options } = refreshCookieOptions();
+  return options;
+}

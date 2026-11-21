@@ -5,6 +5,7 @@ import {
   createAccessToken,
   createRefreshToken,
   hashToken,
+  refreshCookieClearOptions,
   refreshCookieOptions,
   refreshTokenExpiry
 } from "../utils/tokens.js";
@@ -45,7 +46,7 @@ export const refresh = asyncHandler(async (req, res) => {
   const user = await User.findOne({ "refreshTokens.tokenHash": oldHash });
   const record = user?.refreshTokens.find((token) => token.tokenHash === oldHash);
   if (!record || record.revokedAt || record.expiresAt <= new Date() || !user.isActive) {
-    res.clearCookie("refreshToken", refreshCookieOptions());
+    res.clearCookie("refreshToken", refreshCookieClearOptions());
     throw new AppError(401, "Refresh token is invalid or expired.");
   }
 
@@ -73,7 +74,7 @@ export const logout = asyncHandler(async (req, res) => {
       await user.save();
     }
   }
-  res.clearCookie("refreshToken", refreshCookieOptions());
+  res.clearCookie("refreshToken", refreshCookieClearOptions());
   res.status(204).end();
 });
 
